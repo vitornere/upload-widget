@@ -1,0 +1,29 @@
+{
+    // JavaScript/TypeScript
+    "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.codeActionsOnSave": {
+            "quickfix.biome": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports.biome": "always",
+        },
+        "editor.formatOnSave": true,
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.codeActionsOnSave": {
+            "quickfix.biome": "always",
+            "source.fixAll.eslint": "always",
+            "source.organizeImports.biome": "always",
+        }
+    },
+    "biome.enabled": true,
+    "biome_lsp.trace.server": "verbose",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.profiles.osx": {
+        "zsh": {
+        "path": "/bin/zsh",
+        "args": ["-c", "source ~/.nvm/nvm.sh && nvm use && exec zsh"]
+        }
+    }
+}
