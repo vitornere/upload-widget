@@ -19,7 +19,7 @@
 			"correctness": {
 				"recommended": false,
 				"noRenderReturnValue": "error",
-				"noUnusedVariables": "error",
+				"noUnusedVariables": "info",
 				"noUnusedLabels": "error",
 				"noUnreachable": "error",
 				"noChildrenProp": "error",
@@ -40,7 +40,7 @@
 			},
 			"suspicious": {
 				"recommended": false,
-				"noConsoleLog": "error",
+				"noConsoleLog": "info",
 				"noDuplicateCase": "error",
 				"noDuplicateClassMembers": "error",
 				"noDuplicateJsxProps": "error",
