@@ -1,6 +1,6 @@
 import { db } from '@/infra/db'
 import { schema } from '@/infra/db/schemas'
-import { Either, makeRight } from '@/infra/shared/either'
+import { Either, makeRight } from '@/shared/either'
 import { asc, count, desc, ilike } from 'drizzle-orm'
 import { z } from 'zod'
 
