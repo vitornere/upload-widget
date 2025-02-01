@@ -45,7 +45,7 @@ export async function exportUploads(
       { key: 'id', header: 'ID' },
       { key: 'name', header: 'Name' },
       { key: 'remote_url', header: 'URL' },
-      { key: 'created_url', header: 'Uploaded At' },
+      { key: 'created_at', header: 'Uploaded At' },
     ],
   })
 

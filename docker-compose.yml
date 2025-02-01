@@ -10,3 +10,4 @@ services:
       - POSTGRESQL_DATABASE=upload
     volumes:
       - ./docker:/docker-entrypoint-initdb.d
+      - ./.ignore/postgres/:/bitnami/postgresql
