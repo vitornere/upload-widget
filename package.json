@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node dist/infra/http/server.js",
     "dev": "tsx watch --env-file .env src/infra/http/server.ts",
     "lint": "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off",
     "test": "dotenv -e .env.test -- vitest run",
@@ -15,7 +16,8 @@
     "db:migrate:test": "dotenv -e .env.test -- drizzle-kit migrate",
     "db:migrate:test:watch": "dotenv -e .env.test -- drizzle-kit migrate",
     "pretest": "pnpm run db:migrate:test",
-    "postinstall": "lefthook install"
+    "postinstall": "lefthook install",
+    "build": "tsup-node"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +46,7 @@
     "drizzle-kit": "^0.30.2",
     "i": "^0.3.7",
     "lefthook": "^1.10.8",
+    "tsup": "^8.3.6",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vite-tsconfig-paths": "^5.1.4",
