@@ -1,8 +1,8 @@
 {
-  "name": "upload-server",
+  "name": "upload-widget-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Upload Widget Server",
+  "main": "dist/infra/http/server.js",
   "type": "module",
   "scripts": {
     "start": "node dist/infra/http/server.js",
