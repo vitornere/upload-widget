@@ -2,29 +2,51 @@ import * as Collapsible from '@radix-ui/react-collapsible'
 import { UploadWidgetDropzone } from "./upload-widget-dropzone"
 import { UploadWidgetHeader } from "./upload-widget-header"
 import { UploadWidgetUploadList } from "./upload-widget-upload-list"
-import { useState } from 'react'
 import { UploadWidgetMinimizedButton } from "./upload-widget-minimized-button"
+import { motion, useCycle } from 'motion/react'
+
 export function UploadWidget() {
-    const [isWidgetOpen, setIsWidgetOpen] = useState(false)
+    const isThereAnyPendingUpload = true
+    const [isWidgetOpen, toggleWidgetOpen] = useCycle(false, true)
 
 
     return (
-        <Collapsible.Root onOpenChange={setIsWidgetOpen}>
-            {!isWidgetOpen && <UploadWidgetMinimizedButton />}
+        <Collapsible.Root onOpenChange={() => toggleWidgetOpen()} asChild>
+            <motion.div
+                data-progress={isThereAnyPendingUpload}
+                className="overflow-hidden bg-zinc-900 max-w-[360px] rounded-xl data-[state=open]:shadow-shape border border-transparent animate-border data-[state=closed]:rounded-3xl data-[state=closed]:data-[progress=false]:shadow-shape data-[state=closed]:data-[progress=true]:[background:linear-gradient(45deg,#09090B,theme(colors.zinc.900)_50%,#09090B)_padding-box,conic-gradient(from_var(--border-angle),theme(colors.zinc.700/.48)_80%,_theme(colors.indigo.500)_86%,_theme(colors.indigo.300)_90%,_theme(colors.indigo.500)_94%,_theme(colors.zinc.600/.48))_border-box]"
+                variants={{
+                    closed: {
+                        width: 'max-content',
+                        height: 44,
+                        transition: {
+                            type: 'inertia'
+                        }
+                    },
+                    open: {
+                        width: 360,
+                        height: 'auto',
+                        transition: {
+                            duration: 0.1,
+                        }
+                    }
+                }}
+                animate={isWidgetOpen ? 'open' : 'closed'}
+            >
+                {!isWidgetOpen && <UploadWidgetMinimizedButton />}
 
-            <div className="overflow-hidden bg-zinc-900 w-[360px] rounded-xl shadow-shape">
-            <Collapsible.Content>
-                <UploadWidgetHeader />
+                <Collapsible.Content>
+                    <UploadWidgetHeader />
 
-                <div className="flex flex-col gap-4 py-3">
-                    <UploadWidgetDropzone />
+                    <div className="flex flex-col gap-4 py-3">
+                        <UploadWidgetDropzone />
 
-                    <div className="h-px bg-zinc-800 border-t border-black/50 box-content" />
+                        <div className="h-px bg-zinc-800 border-t border-black/50 box-content" />
 
-                    <UploadWidgetUploadList />
-                </div>
-            </Collapsible.Content>
-        </div>
-    </Collapsible.Root>
+                        <UploadWidgetUploadList />
+                    </div>
+                </Collapsible.Content>
+            </motion.div>
+        </Collapsible.Root>
   )
 }
