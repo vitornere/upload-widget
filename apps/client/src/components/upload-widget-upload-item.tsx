@@ -4,13 +4,24 @@ import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import { Upload } from "../store/uploads";
 import { formatBytes } from "../utils/format-bytes";
+import { useUploads } from "../store/uploads";
+
 interface UploadWidgetUploadItemProps {
+    uploadId: string
     upload: Upload
 }
 
 export function UploadWidgetUploadItem({
+    uploadId,
     upload
 }: UploadWidgetUploadItemProps) {
+    const cancelUpload = useUploads(state => state.cancelUpload)
+    
+    const progress = Math.min(
+        Math.round(upload.uploadSizeInBytes / upload.originalSizeInBytes * 100),
+        100
+    )
+
     return (
         <motion.div
             className="p-3 rounded-lg flex flex-col gap-3 shadow-shape-content bg-white/2 relative overflow-hidden"
@@ -25,7 +36,7 @@ export function UploadWidgetUploadItem({
                 </span>
 
                 <span className="text-xxs text-zinc-400 flex gap-1.5 items-center">
-                    <span className="line-through">{formatBytes(upload.file.size)}</span>
+                    <span className="line-through">{formatBytes(upload.originalSizeInBytes)}</span>
                     <div className="size-1 rounded-full bg-zinc-700" />
                     <span>
                         300KB
@@ -34,33 +45,56 @@ export function UploadWidgetUploadItem({
                         </span>
                     </span>
                     <div className="size-1 rounded-full bg-zinc-700" />
-                    <span>
-                        45%
-                    </span>
+                    {upload.status === 'success' && (
+                        <span className="text-green-400">
+                            100%
+                        </span>
+                    )}
+                    {upload.status === 'progress' && (
+                        <span>
+                            {progress}%
+                        </span>
+                    )}
+                    {upload.status === 'error' && (
+                        <span className="text-red-400">
+                            Error
+                        </span>
+                    )}
+                    {upload.status === 'cancelled' && (
+                        <span className="text-yellow-400">
+                            Cancelled
+                        </span>
+                    )}
                 </span>
             </div>
 
-            <Progress.Root className="bg-zinc-800 rounded-full h-1 overflow-hidden">
-                <Progress.Indicator className="bg-indigo-500 h-1" style={{ width: '45%' }} />
+            <Progress.Root
+                data-status={upload.status}
+                className="group bg-zinc-800 rounded-full h-1 overflow-hidden"
+            >
+                <Progress.Indicator
+                    className="bg-indigo-500 h-1 group-data-[status=success]:bg-green-400 group-data-[status=error]:bg-red-400 group-data-[status=cancelled]:bg-yellow-400"
+                    style={{ width: upload.status === 'progress' ? `${progress}%` : '100%' }}
+                />
             </Progress.Root>
 
             <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
-                <Button size="icon-sm">
+                <Button size="icon-sm" disabled={upload.status !== 'success'}>
                     <Download className="size-4" strokeWidth={1.5} />
                     <span className="sr-only">Download compressed image</span>
                 </Button>
 
-                <Button size="icon-sm">
+                <Button size="icon-sm" disabled={upload.status !== 'success'}>
                     <Link2 className="size-4" strokeWidth={1.5} />
                     <span className="sr-only">Copy remote URL</span>
                 </Button>
 
-                <Button size="icon-sm">
+                <Button size="icon-sm" disabled={['progress', 'success'].includes(upload.status)}>
                     <RefreshCcw className="size-4" strokeWidth={1.5} />
                     <span className="sr-only">Retry upload</span>
                 </Button>
 
-                <Button size="icon-sm">
+                <Button disabled={upload.status !== 'progress'} size="icon-sm" onClick={() => cancelUpload(uploadId)}>
                     <X className="size-4" strokeWidth={1.5} />
                     <span className="sr-only">Cancel upload</span>
                 </Button>
