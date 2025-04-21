@@ -4,6 +4,7 @@ import { enableMapSet } from "immer"
 import { uploadFileToStorage } from "../http/upload-file-to-storage"
 import { CanceledError } from "axios"
 import { useShallow } from "zustand/react/shallow"
+import { compressImage } from "../utils/compress-image"
 
 export type Upload = {
     name: string
@@ -11,7 +12,9 @@ export type Upload = {
     abortController: AbortController
     status: 'progress' | 'success' | 'error' | 'cancelled'
     originalSizeInBytes: number
+    compressedSizeInBytes?: number
     uploadSizeInBytes: number
+    remoteUrl?: string
 }
 
 type UploadState = {
@@ -37,8 +40,19 @@ export const useUploads = create<UploadState, [['zustand/immer', never]]>(immer(
         if (!upload) return
 
         try {
-            await uploadFileToStorage({
+            const compressedFile = await compressImage({
                 file: upload.file,
+                maxHeight: 1000,
+                maxWidth: 1000,
+                quality: 0.8,
+            })
+
+            updateUpload(uploadId, {
+                compressedSizeInBytes: compressedFile.size,
+            })
+
+            const { url } = await uploadFileToStorage({
+                file: compressedFile,
                 onProgress: (sizeInBytes) => {
                     updateUpload(uploadId, {
                         uploadSizeInBytes: sizeInBytes,
@@ -50,6 +64,7 @@ export const useUploads = create<UploadState, [['zustand/immer', never]]>(immer(
 
             updateUpload(uploadId, {
                 status: 'success',
+                remoteUrl: url,
             })
         } catch (error) {
             console.error(error)
@@ -116,8 +131,8 @@ export const usePendingUploads = () => {
 
         const { total, uploaded } = Array.from(store.uploads.values()).reduce(
             (acc, upload) => {
-                acc.total += upload.originalSizeInBytes
-                acc.uploaded += upload.uploadSizeInBytes
+                acc.total += upload.compressedSizeInBytes ?? 0
+                acc.uploaded += upload.compressedSizeInBytes ?? 0
 
                 return acc
             },

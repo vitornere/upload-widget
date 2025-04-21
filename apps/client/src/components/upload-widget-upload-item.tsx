@@ -1,4 +1,5 @@
 import * as Progress from "@radix-ui/react-progress";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { Download, ImageUp, Link2, RefreshCcw, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion } from "motion/react";
@@ -18,9 +19,11 @@ export function UploadWidgetUploadItem({
     const cancelUpload = useUploads(state => state.cancelUpload)
     
     const progress = Math.min(
-        Math.round(upload.uploadSizeInBytes / upload.originalSizeInBytes * 100),
+        upload.compressedSizeInBytes ? Math.round(upload.uploadSizeInBytes / upload.compressedSizeInBytes * 100) : 0,
         100
     )
+
+    const shortName = upload.name.length > 15 ? `${upload.name.slice(0, 15)}...` : upload.name
 
     return (
         <motion.div
@@ -32,7 +35,22 @@ export function UploadWidgetUploadItem({
             <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium flex items-center gap-1">
                     <ImageUp className="size-3 text-zinc-300" strokeWidth={1.5} />
-                    <span>{upload.name}</span>
+                    <Tooltip.Provider>
+                        <Tooltip.Root>
+                            <Tooltip.Trigger asChild>
+                                <span>{shortName}</span>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                                <Tooltip.Content
+                                    className="rounded-md bg-zinc-800 px-4 py-2 text-sm text-zinc-400"
+                                    sideOffset={5}
+                                >
+                                    {upload.name}
+                                    <Tooltip.Arrow className="fill-zinc-800" />
+                                </Tooltip.Content>
+                            </Tooltip.Portal>
+                        </Tooltip.Root>
+                    </Tooltip.Provider>
                 </span>
 
                 <span className="text-xxs text-zinc-400 flex gap-1.5 items-center">
@@ -84,7 +102,7 @@ export function UploadWidgetUploadItem({
                     <span className="sr-only">Download compressed image</span>
                 </Button>
 
-                <Button size="icon-sm" disabled={upload.status !== 'success'}>
+                <Button size="icon-sm" disabled={!upload.remoteUrl} onClick={() => upload.remoteUrl && navigator.clipboard.writeText(upload.remoteUrl)}>
                     <Link2 className="size-4" strokeWidth={1.5} />
                     <span className="sr-only">Copy remote URL</span>
                 </Button>
