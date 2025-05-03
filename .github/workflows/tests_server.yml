@@ -10,7 +10,7 @@ on:
     types: [opened, reopened, labeled, unlabeled, synchronize]
 
 jobs:
-  run-ci:
+  tests:
     name: Run E2E Server Tests
     runs-on: ubuntu-latest
     defaults:
@@ -56,3 +56,76 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+  trivy:
+    name: Run Trivy vulnerability scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          push: false
+          context: .
+          tags: ${{ vars.ECR_REPOSITORY }}:trivy
+          cache-from: type=gha,scope=server-build
+          cache-to: type=gha,mode=max,scope=server-build
+
+      - name: Run Trivy scanner
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          image-ref: ${{ vars.ECR_REPOSITORY }}:trivy
+          format: table
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+
+  push:
+    name: Push Server Image
+    needs: [tests, trivy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Generate image tag
+        id: image-tag
+        run: |
+          SHA=$(echo $GITHUB_SHA | cut -c 1-7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image to AWS ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ steps.image-tag.outputs.sha }}
+          cache-from: type=gha,scope=server-build
