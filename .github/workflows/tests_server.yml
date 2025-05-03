@@ -78,7 +78,7 @@ jobs:
         with:
           load: true
           push: false
-          context: .
+          context: ./apps/server
           tags: ${{ vars.ECR_REPOSITORY }}:trivy
           cache-from: type=gha,scope=server-build
           cache-to: type=gha,mode=max,scope=server-build
