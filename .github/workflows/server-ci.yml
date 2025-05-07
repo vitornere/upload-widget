@@ -1,4 +1,4 @@
-name: E2E Server Tests
+name: E2E Server Tests and Deploy
 
 on:
   push:
@@ -96,6 +96,7 @@ jobs:
     name: Push Server Image
     needs: [tests, trivy]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     defaults:
       run:
         working-directory: ./apps/server

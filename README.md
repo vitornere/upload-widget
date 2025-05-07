@@ -20,6 +20,7 @@ monorepo/
 ├── apps/
 │   ├── server/                  # Fastify API for image uploads
 │   └── client/                  # React client application
+├── iac/                         # Infrastructure as Code for AWS using Pulumi
 ├── .github/                     # GitHub workflows, issue templates, etc.
 ├── .vscode/                     # VSCode workspace settings
 └── README.md                    # This file
