@@ -50,8 +50,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
           AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
         run: |
-          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile nere-ftr
-          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile nere-ftr
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID --profile nere-ftr
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY --profile nere-ftr
           aws configure set aws_region us-east-2 --profile nere-ftr
 
       - name: Run Pulumi
