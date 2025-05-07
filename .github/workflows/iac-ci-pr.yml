@@ -65,3 +65,4 @@ jobs:
           command: preview
           stack-name: ${{ vars.STACK_NAME }}
           cloud-url: s3://${{ vars.BUCKET_NAME }}
+          work-dir: ./iac
