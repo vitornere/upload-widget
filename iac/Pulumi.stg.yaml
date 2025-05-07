@@ -1,0 +1,4 @@
+encryptionsalt: v1:Nc5gApp16CE=:v1:qAleBxXKFwdKffDy:YzxIr3Xj9/hGZUIj15JS33Yeni91OQ==
+config:
+  aws:profile: nere-ftr
+  aws:region: us-east-2
