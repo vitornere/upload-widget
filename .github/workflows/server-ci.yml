@@ -96,6 +96,7 @@ jobs:
     name: Push Server Image
     needs: [tests, trivy]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     defaults:
       run:
         working-directory: ./apps/server
