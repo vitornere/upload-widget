@@ -1,13 +1,17 @@
-name: IAC - CI - Main
+name: IAC - CI
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, labeled, unlabeled, synchronize]
 
 jobs:
   deploy:
-    name: Run IAC Deploy
+    name: Run IAC ${{ github.event_name == 'pull_request' && 'Preview' || 'Deploy' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,7 +65,7 @@ jobs:
           AWS_REGION: us-east-2
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         with:
-          command: up
+          command: ${{ github.event_name == 'pull_request' && 'preview' || 'up' }}
           stack-name: ${{ vars.STACK_NAME }}
           cloud-url: s3://${{ vars.BUCKET_NAME }}
           work-dir: ./iac
