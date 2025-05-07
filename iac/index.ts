@@ -10,5 +10,13 @@ const bucket = new aws.s3.BucketV2("my-bucket-ftr", {
     },
 });
 
+const bucket2 = new aws.s3.BucketV2("my-bucket-ftr-2", {
+    tags: {
+        Name: "my-bucket-ftr-2",
+        IAC: "true",
+    },
+});
+
 // Export the name of the bucket
 export const bucketName = bucket.id;
+export const bucketName2 = bucket2.id;
